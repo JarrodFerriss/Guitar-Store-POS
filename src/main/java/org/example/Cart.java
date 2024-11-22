@@ -6,66 +6,65 @@ package org.example;
 // Date: 2024-09-22
 
 import org.example.objects.Guitar;
+
 import java.util.ArrayList;
+import java.util.List;
 
 public class Cart {
 
-    //Initialize the ArrayList to contain the cart contents
-    ArrayList<Guitar> cart = new ArrayList<>();
-    //Initialize the subtotal variable
-    float subTotal = 0.00f;
-    float tax = 0.00f;
+    // List to hold the items in the cart
+    private List<Guitar> cart = new ArrayList<>();
+    private static final float TAX_RATE = 0.13f;
 
-    //Add to cart
+    // Add a guitar to the cart
     public void addToCart(Guitar guitar) {
-
-        //Add the guitar to the arrayList
         cart.add(guitar);
-        System.out.println(guitar.getBrand() + " " +
-                guitar.getBody() + " has been added to the cart.");
+        System.out.println(guitar.getSpec().getProperty("brand") + " " +
+                guitar.getSpec().getProperty("body") + " has been added to the cart.");
     }
 
-    //Display the cart
+    // Display the contents of the cart
     public void displayCart() {
-
-        System.out.println("Items in cart: ");
-        //For each guitar in the cart
-        for (Guitar guitar : cart) {
-            System.out.println(guitar);
+        if (cart.isEmpty()) {
+            System.out.println("The cart is empty.");
+        } else {
+            System.out.println("Items in cart:");
+            for (Guitar guitar : cart) {
+                System.out.println(guitar);
+            }
         }
     }
 
-    //Subtotal
-    public float subTotal(Guitar guitar) {
-
-        //save the price of the guitar to a variable
-        float guitarPrice = guitar.getPrice();
-        //Add the price of the guitar to the subtotal
-        subTotal += guitarPrice;
-
+    // Calculate the subtotal
+    public float calculateSubTotal() {
+        float subTotal = 0.0f;
+        for (Guitar guitar : cart) {
+            subTotal += guitar.getPrice();
+        }
         return subTotal;
     }
 
-    //Tax
-    public float tax(float subTotal) {
-
-        //Calculate the running total of tax to be paid
-        tax += subTotal * 0.13f;
-
-        return tax;
+    // Calculate the tax
+    public float calculateTax(float subTotal) {
+        return subTotal * TAX_RATE;
     }
 
-    //Final total
-    public float total(float subTotal, float tax) {
-
-        //Calculate the final total and return
+    // Calculate the total amount
+    public float calculateTotal(float subTotal, float tax) {
         return subTotal + tax;
     }
 
-    //Cash out
-    public float cashout(float total, float cash) {
+    // Cash out and calculate change
+    public float cashOut(float cashProvided) {
+        float subTotal = calculateSubTotal();
+        float tax = calculateTax(subTotal);
+        float total = calculateTotal(subTotal, tax);
 
-        //Calculate the change and return
-        return cash - total;
+        if (cashProvided < total) {
+            System.out.println("Insufficient cash provided.");
+            return -1; // Indicate an error in cash provided
+        }
+
+        return cashProvided - total;
     }
 }

@@ -8,120 +8,109 @@ package org.example;
 import org.example.objects.AcousticGuitar;
 import org.example.objects.ElectricGuitar;
 import org.example.objects.Guitar;
+import org.example.objects.GuitarSpec;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class StoreInventory {
 
         //Initialize the arrays for the store inventory
-        ElectricGuitar[] electricInventory = new ElectricGuitar[3];
-        AcousticGuitar[] acousticInventory = new AcousticGuitar[3];
+        private List<Guitar> inventory = new ArrayList<>();
 
         //Create guitar objects
         public void initializeInventory() {
-        //Populate the arrays with store inventory
-        electricInventory[0] = new ElectricGuitar("Ibanez",
-                "Stratocaster", 6, 24,
-                8675309, 699.99f, 3);
+                // Electric Guitar 1
+                Map<String, Object> electricProperties1 = new HashMap<>();
+                electricProperties1.put("brand", "Ibanez");
+                electricProperties1.put("body", "Stratocaster");
+                electricProperties1.put("numberOfStrings", 6);
+                electricProperties1.put("numberOfFrets", 24);
+                inventory.add(new ElectricGuitar(8675309, 699.99f, 3, new GuitarSpec(electricProperties1)));
 
-        electricInventory[1] = new ElectricGuitar("Gibson",
-                "Les Paul", 6, 22,
-                8675308, 2499.99f, 2);
+                // Electric Guitar 2
+                Map<String, Object> electricProperties2 = new HashMap<>();
+                electricProperties2.put("brand", "Gibson");
+                electricProperties2.put("body", "Les Paul");
+                electricProperties2.put("numberOfStrings", 6);
+                electricProperties2.put("numberOfFrets", 22);
+                inventory.add(new ElectricGuitar(8675308, 2499.99f, 2, new GuitarSpec(electricProperties2)));
 
-        electricInventory[2] = new ElectricGuitar("Fender",
-                "Stratocaster", 6, 21,
-                8675307, 1199.99f, 3);
+                // Electric Guitar 3
+                Map<String, Object> electricProperties3 = new HashMap<>();
+                electricProperties3.put("brand", "Fender");
+                electricProperties3.put("body", "Stratocaster");
+                electricProperties3.put("numberOfStrings", 6);
+                electricProperties3.put("numberOfFrets", 21);
+                inventory.add(new ElectricGuitar(8675307, 1199.99f, 3, new GuitarSpec(electricProperties3)));
 
-        //Acoustic Guitars
-        acousticInventory[0] = new AcousticGuitar("Martin",
-                "D-28", 6, 20,
-                112233, 2999.99f, 2);
+                // Acoustic Guitar 1
+                Map<String, Object> acousticProperties1 = new HashMap<>();
+                acousticProperties1.put("brand", "Martin");
+                acousticProperties1.put("body", "D-28");
+                acousticProperties1.put("numberOfStrings", 6);
+                acousticProperties1.put("numberOfFrets", 20);
+                inventory.add(new AcousticGuitar(112233, 2999.99f, 2, new GuitarSpec(acousticProperties1)));
 
-        acousticInventory[1] = new AcousticGuitar("Taylor",
-                "114ce", 6, 20,
-                223344, 999.99f, 2);
+                // Acoustic Guitar 2
+                Map<String, Object> acousticProperties2 = new HashMap<>();
+                acousticProperties2.put("brand", "Taylor");
+                acousticProperties2.put("body", "114ce");
+                acousticProperties2.put("numberOfStrings", 6);
+                acousticProperties2.put("numberOfFrets", 20);
+                inventory.add(new AcousticGuitar(223344, 999.99f, 2, new GuitarSpec(acousticProperties2)));
 
-        acousticInventory[2] = new AcousticGuitar("Yamaha",
-                "FG800", 6, 20,
-                334455, 199.99f, 4);
+                // Acoustic Guitar 3
+                Map<String, Object> acousticProperties3 = new HashMap<>();
+                acousticProperties3.put("brand", "Yamaha");
+                acousticProperties3.put("body", "FG800");
+                acousticProperties3.put("numberOfStrings", 6);
+                acousticProperties3.put("numberOfFrets", 20);
+                inventory.add(new AcousticGuitar(334455, 199.99f, 4, new GuitarSpec(acousticProperties3)));
         }
+
 
         //Display Inventory
         public void displayInventory() {
-
-                System.out.println("Electric Guitars: ");
-                //For each electric guitar in the inventory
-                for (ElectricGuitar electric : electricInventory) {
-                        //toString
-                        System.out.println(electric);
-                }
-
-                System.out.println("Acoustic Guitars: ");
-                //For each acoustic guitar in the inventory
-                for (AcousticGuitar acoustic : acousticInventory) {
-                        //toString
-                        System.out.println(acoustic);
+                for (Guitar guitar : inventory) {
+                        System.out.println(guitar);
                 }
         }
 
         //Get a guitar by given serial
-        public Guitar getGuitarBySerial(int enteredSerial) {
-
-                //For electric guitars in the inventory
-                for (ElectricGuitar electric : electricInventory) {
-                        //If the serial number matches
-                        if (enteredSerial == electric.getSerialNumber()) {
-                                //Return that guitar
-                                return electric;
+        public Guitar getGuitarBySerial(int serialNumber) {
+                for (Guitar guitar : inventory) {
+                        if (guitar.getSerialNumber() == serialNumber) {
+                                return guitar;
                         }
                 }
-
-                //For acoustic guitars in the inventory
-                for (AcousticGuitar acoustic : acousticInventory) {
-                        //If the serial number matches
-                        if (enteredSerial == acoustic.getSerialNumber()) {
-                                //Return the guitar
-                                return acoustic;
-                        }
-                }
-
-                //If the guitar does not exist return null
                 return null;
         }
 
         //Check the given serial number
-        public Boolean checkSerial(int enteredSerial) {
-
-                //Return true if the entered serial number is not null
-                return getGuitarBySerial(enteredSerial) != null;
+        public boolean checkSerial(int serialNumber) {
+                return getGuitarBySerial(serialNumber) != null;
         }
 
         //Remove a selected guitar from the inventory
         public void updateInventory(int serialNumber) {
-
-                //Search for the guitar
                 Guitar guitar = getGuitarBySerial(serialNumber);
+                if (guitar != null && guitar.getNumberInStock() > 0) {
+                        guitar.setNumberInStock(guitar.getNumberInStock() - 1);
+                }
+        }
 
-                //If it is found
-                if (guitar != null) {
-
-                        //Get the number currently in stock
-                        int numberInStock = guitar.getNumberInStock();
-
-                        //If its greater than 0
-                        if (numberInStock > 0) {
-
-                                //Decrease the number in stock by 1
-                                guitar.setNumberInStock(numberInStock - 1);
-                                //Print the guitar information
-                                System.out.println("Purchase confirmed! Updated stock for " +
-                                        guitar.getBrand() + " " + guitar.getBody() + ": " +
-                                        guitar.getNumberInStock());
-                        //If there are none in the inventory
-                        } else {
-
-                                //Let the user know
-                                System.out.println("Currently out of stock!");
-                                System.out.println("Come back soon!");
+        // Search for guitars based on dynamic criteria
+        public List<Guitar> search(GuitarSpec searchSpec) {
+                List<Guitar> matchingGuitars = new ArrayList<>();
+                for (Guitar guitar : inventory) {
+                        // Use the GuitarSpec.matches method to compare specs
+                        if (guitar.getSpec().matches(searchSpec)) {
+                                matchingGuitars.add(guitar);
                         }
                 }
+                return matchingGuitars;
         }
 }

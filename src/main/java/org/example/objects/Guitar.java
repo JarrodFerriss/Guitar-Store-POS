@@ -1,80 +1,26 @@
 package org.example.objects;
 
-// Program Name: Guitar Parent Class
-// Program Purpose: Declare the parent guitar class {Will be split into Electric and Acoustic Child Classes}
-// Author Name: Jarrod Ferriss
-// Date: 2024-09-22
-
 public class Guitar {
+    private int serialNumber;       // Unique identifier for each guitar
+    private float price;            // Price of the guitar
+    private int numberInStock;      // Quantity available in inventory
+    private GuitarSpec spec;        // Dynamic specifications
 
-    //Properties
-    String brand;
-    String body;
-    int numberOfStrings;
-    int numberOfFrets;
-    int serialNumber;
-    float price;
-    int numberInStock;
-
-    //Constructor
-    public Guitar(String brand, String body, int numberOfStrings, int numberOfFrets, int serialNumber,
-                  float price, int numberInStock) {
-        this.brand = brand;
-        this.body = body;
-        this.numberOfStrings = numberOfStrings;
-        this.numberOfFrets = numberOfFrets;
+    // Constructor
+    public Guitar(int serialNumber, float price, int numberInStock, GuitarSpec spec) {
         this.serialNumber = serialNumber;
         this.price = price;
         this.numberInStock = numberInStock;
+        this.spec = spec;
     }
 
-    //Getters Setters
-    public String getBrand() {
-        return brand;
-    }
-
-    public void setBrand(String brand) {
-        this.brand = brand;
-    }
-
-    public String getBody() {
-        return body;
-    }
-
-    public void setBody(String body) {
-        this.body = body;
-    }
-
-    public int getNumberOfStrings() {
-        return numberOfStrings;
-    }
-
-    public void setNumberOfStrings(int numberOfStrings) {
-        this.numberOfStrings = numberOfStrings;
-    }
-
-    public int getNumberOfFrets() {
-        return numberOfFrets;
-    }
-
-    public void setNumberOfFrets(int numberOfFrets) {
-        this.numberOfFrets = numberOfFrets;
-    }
-
+    // Getters
     public int getSerialNumber() {
         return serialNumber;
     }
 
-    public void setSerialNumber(int serialNumber) {
-        this.serialNumber = serialNumber;
-    }
-
     public float getPrice() {
         return price;
-    }
-
-    public void setPrice(float price) {
-        this.price = price;
     }
 
     public int getNumberInStock() {
@@ -83,5 +29,17 @@ public class Guitar {
 
     public void setNumberInStock(int numberInStock) {
         this.numberInStock = numberInStock;
+    }
+
+    public GuitarSpec getSpec() {
+        return spec;
+    }
+
+    @Override
+    public String toString() {
+        return "Serial: " + serialNumber +
+                ", Price: $" + price +
+                ", In Stock: " + numberInStock +
+                ", Specifications: " + spec.getProperties();
     }
 }

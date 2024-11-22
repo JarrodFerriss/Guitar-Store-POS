@@ -1,146 +1,164 @@
 package org.example;
 
-// Program Name: Guitar Store POS
-// Program Purpose: Help manage sales of a guitar store
-// Author: Jarrod Ferriss
-// Date: 2024-09-22
-
 import org.example.objects.Guitar;
+import org.example.objects.GuitarSpec;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
 
-            /*
-             - Develop a POS system for a client X
-             - One type of product for sale, but plan on adding more X
-             - One employee and one business location X
-             - Client wants to accept cash payments and the program should calculate tax X
-
-             Additional Requirements:
-             - Each product will have a serial number X
-             - Products may have different price, brand, and model X
-             - A customer can purchase many goods with one transaction X
-             - The system will display the product description, price and running total after
-             each product is entered X
-             - Once the products are selected, the program will show a list of products, the subtotal,
-             taxes, and grand total X
-             - The system should calculate the change for the transaction X
-             - Enter a starting inventory during the initialization of the program X
-
-         */
-
     public static void main(String[] args) {
 
-        //Initialize loop sentinel variables
+        // Initialize loop sentinel variables
         boolean loop = true;
-        String repeat;
 
-        //Instantiate and initialize the storeInventory
+        // Instantiate and initialize the storeInventory
         StoreInventory storeInventory = new StoreInventory();
         storeInventory.initializeInventory();
 
-        //Begin the main program loop
+        // Instantiate the cart
+        Cart cart = new Cart();
+
+        // Begin the main program loop
         while (loop) {
 
-            //Ask the user to login
+            // Ask the user to log in
             Scanner scanner = new Scanner(System.in);
 
             System.out.println("Welcome to our guitar shop!");
             System.out.println("Sign in to begin purchasing.");
             System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 
-            System.out.println("Please enter the Store Number (659874): "); //Store number given
+            System.out.println("Please enter the Store Number (659874): "); // Store number given
             int storeNumber = scanner.nextInt();
 
-            System.out.println("Please enter Employee ID (564231): "); //Employee ID given
+            System.out.println("Please enter Employee ID (564231): "); // Employee ID given
             int employeeID = scanner.nextInt();
 
-            //Instantiate the login script
+            // Instantiate the login script
             Login login = new Login();
 
-            //If the credentials are valid
+            // If the credentials are valid
             if (login.loginCheck(storeNumber, employeeID)) {
 
                 System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
                 System.out.println("Login Successful!");
                 System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 
-                System.out.println("Here is our current store inventory: ");
-                storeInventory.displayInventory(); //display the current store inventory
-                System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-
-                //Instantiate the cart
-                Cart cart = new Cart();
-
                 while (loop) {
+                    System.out.println("Here is our current store inventory: ");
+                    storeInventory.displayInventory(); // Display the current store inventory
+                    System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 
-                    //Ask the user to enter a serial number
-                    System.out.println("Please enter the serial number of the item you would like to purchase: ");
-                    int serialNumber = scanner.nextInt();
+                    System.out.println("What would you like to do?");
+                    System.out.println("1. Search for a guitar");
+                    System.out.println("2. Purchase a guitar");
+                    System.out.println("3. Checkout");
 
-                    //If the serial number is valid
-                    if (storeInventory.checkSerial(serialNumber)) {
+                    int choice = scanner.nextInt();
+                    scanner.nextLine(); // Consume newline character
 
-                        //Save the selected guitar to a variable
-                        Guitar selectedGuitar = storeInventory.getGuitarBySerial(serialNumber);
+                    switch (choice) {
+                        case 1: // Search for a guitar
+                            System.out.println("Enter search criteria (e.g., brand, body, numberOfStrings):");
+                            System.out.println("Type 'done' when finished.");
 
-                        //If the guitar exists
-                        if (selectedGuitar != null) {
+                            Map<String, Object> searchProperties = new HashMap<>();
+                            while (true) {
+                                System.out.print("Enter property key: ");
+                                String key = scanner.nextLine().trim();
+                                if (key.equalsIgnoreCase("done")) break;
 
-                            System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-                            cart.addToCart(selectedGuitar); //Add the guitar to the cart
-                            storeInventory.updateInventory(serialNumber); //Take the guitar out of stock
+                                System.out.print("Enter property value: ");
+                                String value = scanner.nextLine().trim();
 
-                            float subTotal = cart.subTotal(selectedGuitar); //Calculate the subtotal
-                            System.out.println("The current subtotal is: $" + subTotal);
+                                // Try to parse as an integer if applicable
+                                Object finalValue;
+                                try {
+                                    finalValue = Integer.parseInt(value);
+                                } catch (NumberFormatException e) {
+                                    finalValue = value;
+                                }
 
-                            float tax = cart.tax(subTotal); //Calculate the tax
-                            System.out.printf("The current tax is: $%.2f%n", tax);
-
-                            float total = cart.total(subTotal, tax); //Calculate the total
-                            System.out.printf("The current total with tax is: $%.2f%n", total);
-                            System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-
-                            System.out.println("Would you like to continue shopping (Y/N): ");
-                            repeat = scanner.next().trim().toUpperCase(); //Ask the user to continue?
-
-                            //If the user wants to check out
-                            if (repeat.equals("N")) {
-
-                                System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-                                cart.displayCart(); //Display the contents of the cart
-                                System.out.printf("The current total with tax is: $%.2f%n", total); //Display the total
-
-                                System.out.println("Please enter how much cash you want to pay with: ");
-                                float cashIn = scanner.nextFloat(); //Get the cash from the customer
-
-                                System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-                                System.out.printf("Your change is: $%.2f%n", cart.cashout(total, cashIn)); //Calculate the change
-
-                                loop = false; //End the program loop
-                                scanner.close(); //Close the scanner
+                                searchProperties.put(key, finalValue);
                             }
-                        }
-                    //If the serial number is invalid
-                    } else {
 
-                        //Inform the user and ask them to try again
-                        System.out.println("That item does not exist.");
-                        System.out.println("Please try again.");
+                            GuitarSpec searchSpec = new GuitarSpec(searchProperties);
+                            List<Guitar> results = storeInventory.search(searchSpec);
+
+                            if (!results.isEmpty()) {
+                                System.out.println("Matching guitars:");
+                                for (Guitar guitar : results) {
+                                    System.out.println(guitar);
+                                }
+                            } else {
+                                System.out.println("No guitars matched your criteria.");
+                            }
+                            break;
+
+                        case 2: // Purchase a guitar
+                            System.out.println("Enter the serial number of the guitar you want to purchase: ");
+                            int serialNumber = scanner.nextInt();
+
+                            if (storeInventory.checkSerial(serialNumber)) {
+                                Guitar selectedGuitar = storeInventory.getGuitarBySerial(serialNumber);
+
+                                if (selectedGuitar != null) {
+                                    System.out.println("Guitar details:");
+                                    System.out.println(selectedGuitar);
+                                    System.out.println("Add guitar to cart? (Y/N)");
+                                    String confirm = scanner.next().trim().toUpperCase();
+
+                                    if (confirm.equals("Y")) {
+                                        storeInventory.updateInventory(serialNumber);
+                                        cart.addToCart(selectedGuitar);
+                                        System.out.println("Guitar added to cart!");
+                                    }
+                                }
+                            } else {
+                                System.out.println("The entered serial number does not exist.");
+                            }
+                            break;
+
+                        case 3: // Exit
+                            System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                            System.out.println("Checking out...");
+                            cart.displayCart(); // Display the cart contents
+
+                            float subTotal = cart.calculateSubTotal();
+                            float tax = cart.calculateTax(subTotal);
+                            float total = cart.calculateTotal(subTotal, tax);
+
+                            System.out.printf("Subtotal: $%.2f%n", subTotal);
+                            System.out.printf("Tax: $%.2f%n", tax);
+                            System.out.printf("Total: $%.2f%n", total);
+
+                            System.out.println("Please enter the amount of cash you are paying with:");
+                            float cashProvided = scanner.nextFloat();
+
+                            float change = cart.cashOut(cashProvided);
+                            if (change >= 0) {
+                                System.out.printf("Transaction successful! Your change is: $%.2f%n", change);
+                                loop = false; // End the program loop
+                            } else {
+                                System.out.println("Insufficient cash provided. Please try again.");
+                            }
+                            break;
+
+                        default:
+                            System.out.println("Invalid choice. Please try again.");
+                            break;
                     }
                 }
-            //If the credentials are incorrect
             } else {
-
-                //Inform the user and ask them to try again
                 System.out.println("The Store Number or Employee ID are incorrect!");
                 System.out.println("Please try again!");
             }
         }
 
-        //Thank the user for shopping with us
         System.out.println("Thank you for visiting our shop.");
-        System.out.println("Come back soon!");
     }
 }
